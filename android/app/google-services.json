@@ -1,26 +1,111 @@
 {
   "project_info": {
-    "project_number": "1001721401197",
-    "project_id": "giragiramap",
-    "storage_bucket": "giragiramap.firebasestorage.app"
+    "project_number": "524871713161",
+    "project_id": "fuwafuwa-firstapp-468023",
+    "storage_bucket": "fuwafuwa-firstapp-468023.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1001721401197:android:3ce6c5f306d9ac9b139464",
+        "mobilesdk_app_id": "1:524871713161:android:0580fe4172f331fa022158",
         "android_client_info": {
-          "package_name": "com.example.giragiramap"
+          "package_name": "com.example.fuwafuwa"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "524871713161-bk6f19tn800lp5te86gvusvafob6s95d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.fuwafuwa",
+            "certificate_hash": "8d6469cb1c6e95d1b93afa40510a43d16e8507f4"
+          }
+        },
+        {
+          "client_id": "524871713161-ld31u43i0s87n460nckbe6ste8hnlhk3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.fuwafuwa",
+            "certificate_hash": "1d559120713d10fdbbcfc272bb71225c44082eb5"
+          }
+        },
+        {
+          "client_id": "524871713161-s6k4j3q70ap0kb3kcs09kodci4ai04g5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.fuwafuwa",
+            "certificate_hash": "e984b1478675f390582034a571ca4e7cc1dd3584"
+          }
+        },
+        {
+          "client_id": "524871713161-vmh1ipmd0iehnhq2qmvhj123n36f5gt7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.fuwafuwa",
+            "certificate_hash": "aea1de00099d11462fdd0e9115d7a39aa089a80a"
+          }
+        },
+        {
+          "client_id": "524871713161-vdglgtc1r1tgvjnogsjk2l8v888tdqle.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyA0JVJLuj7h2lse4k1ZeyplbOUfux_UAoE"
+          "current_key": "AIzaSyBIuNZZCn7tMFHl5dFuKabytyJwQJaGa4k"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "524871713161-sgjltt6rbfg9kk1l8v6c9uc7lc1et9l3.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "524871713161-vlo1mbg9lj63a9j9vfenbf6rv8ugiohg.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.fuwafuwa"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:524871713161:android:a12219b5d3582d66022158",
+        "android_client_info": {
+          "package_name": "com.example.giragiramap"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "524871713161-vdglgtc1r1tgvjnogsjk2l8v888tdqle.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBIuNZZCn7tMFHl5dFuKabytyJwQJaGa4k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "524871713161-sgjltt6rbfg9kk1l8v6c9uc7lc1et9l3.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "524871713161-vlo1mbg9lj63a9j9vfenbf6rv8ugiohg.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.fuwafuwa"
+              }
+            }
+          ]
         }
       }
     }
