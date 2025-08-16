@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1001721401197",
+    "project_id": "giragiramap",
+    "storage_bucket": "giragiramap.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1001721401197:android:3ce6c5f306d9ac9b139464",
+        "android_client_info": {
+          "package_name": "com.example.giragiramap"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA0JVJLuj7h2lse4k1ZeyplbOUfux_UAoE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

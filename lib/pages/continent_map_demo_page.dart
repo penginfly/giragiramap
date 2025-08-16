@@ -1,12 +1,12 @@
 // continent_map_demo_page.dart
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../ui/widgets/continent_chip.dart';
 import '../ui/widgets/sparkle_pin.dart';
 import '../ui/widgets/interactive_sparkle_pin.dart';
 import '../ui/widgets/pin_tooltip.dart';
-import '../../data/dummy_data.dart';
 import '../ui/widgets/pin_creation_modal.dart';
-import '../ui/widgets/wavy_background.dart'; // ← 追加
+import '../../data/dummy_data.dart'; // ダミーデータはまだ使用
 
 class ContinentMapScrollablePage extends StatefulWidget {
   const ContinentMapScrollablePage({super.key});
@@ -18,38 +18,41 @@ class ContinentMapScrollablePage extends StatefulWidget {
 
 class _ContinentMapScrollablePageState
     extends State<ContinentMapScrollablePage> {
-  // 大陸の座標など（変更なし）
+  // GlobalKeyの定義
   final GlobalKey _academicsKey = GlobalKey();
   final GlobalKey _creativityKey = GlobalKey();
   final GlobalKey _careerKey = GlobalKey();
   final GlobalKey _healthKey = GlobalKey();
-
   static const Size mapSize = Size(2000, 1200);
   static const double pad = 160;
   String? _selectedPinId;
 
-  final Map<String, Offset> _continentPositions = const {
-    "Academics": Offset(300, 250),
-    "Creativity": Offset(1300, 300),
-    "Career": Offset(600, 700),
-    "Health": Offset(1350, 750),
+  // 大陸ごとのワールド座標をMapで定義
+  final Map<String, Offset> _continentPositions = {
+    "Academics": const Offset(300, 250),
+    "Creativity": const Offset(1300, 300),
+    "Career": const Offset(600, 700),
+    "Health": const Offset(1350, 750),
   };
 
-  // 大陸長押し → モーダル起動（変更なし）
+  // onLongPress コールバックで呼び出される関数
   void _onContinentLongPress(
-    String category,
-    LongPressStartDetails details,
-    GlobalKey key,
-  ) {
-    final renderBox = key.currentContext!.findRenderObject() as RenderBox;
-    final localPosition = renderBox.globalToLocal(details.globalPosition);
+      String category,
+      LongPressStartDetails details,
+      GlobalKey key,
+      ) {
+    final RenderBox renderBox =
+    key.currentContext!.findRenderObject() as RenderBox;
+    final Offset localPosition = renderBox.globalToLocal(details.globalPosition);
+
+    print('長押しされた大陸: $category');
+    print('大陸内のローカル座標: $localPosition');
+
     _showPinCreationModal(category, localPosition);
   }
 
-  Future<void> _showPinCreationModal(
-    String category,
-    Offset localPosition,
-  ) async {
+  // モーダル画面を表示する関数
+  void _showPinCreationModal(String category, Offset localPosition) async {
     final newPinData = await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -62,13 +65,26 @@ class _ContinentMapScrollablePageState
     );
 
     if (newPinData != null) {
-      setState(() => dummyPins.add(newPinData));
+      // ★ Firebaseにデータを追加するロジック
+      final pinsCollection = FirebaseFirestore.instance.collection('pins');
+      await pinsCollection.add({
+        'title': newPinData['title'],
+        'description': newPinData['description'],
+        'category': newPinData['category'],
+        'userId': 'user_a_id', // 仮のユーザーID
+        'xPosition': newPinData['xPosition'],
+        'yPosition': newPinData['yPosition'],
+      });
+      setState(() {
+        _selectedPinId = null; // 新しいピン作成後は吹き出しを閉じる
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF87CEEB),
       body: InteractiveViewer(
         minScale: 0.5,
         maxScale: 2.5,
@@ -80,37 +96,31 @@ class _ContinentMapScrollablePageState
           height: mapSize.height + pad * 2,
           child: Stack(
             children: [
-              // ← ここを差し替え：1枚画像を左右スライドで“波”
               const Positioned.fill(
-                child: TiledWavyBackground(
-                  assetPath: "assets/images/wave.png",
-                  amplitude: 8, // 揺れ幅
-                  period: Duration(seconds: 4), // 往復4秒
-                  tileScale: 0.3, // 波の粒を細かく
-                ),
+                child: ColoredBox(color: Color(0xFF87CEEB)),
               ),
-
-              // マップ本体（大陸・ピンはそのまま）
               Positioned(
                 left: pad,
                 top: pad,
                 width: mapSize.width,
                 height: mapSize.height,
                 child: Stack(
-                  clipBehavior: Clip.none,
                   children: [
-                    // 大陸チップ群（変えてません）
+                    const Positioned.fill(
+                      child: ColoredBox(color: Color(0xFF87CEEB)),
+                    ),
+
+                    // 大陸チップを配置
                     Positioned(
                       left: _continentPositions["Academics"]!.dx,
                       top: _continentPositions["Academics"]!.dy,
                       child: ContinentChip(
                         key: _academicsKey,
                         label: "Academics",
-                        onLongPressStart: (details) => _onContinentLongPress(
-                          "Academics",
-                          details,
-                          _academicsKey,
-                        ),
+                        onLongPressStart: (details) {
+                          _onContinentLongPress(
+                              "Academics", details, _academicsKey);
+                        },
                       ),
                     ),
                     Positioned(
@@ -119,11 +129,10 @@ class _ContinentMapScrollablePageState
                       child: ContinentChip(
                         key: _creativityKey,
                         label: "Creativity",
-                        onLongPressStart: (details) => _onContinentLongPress(
-                          "Creativity",
-                          details,
-                          _creativityKey,
-                        ),
+                        onLongPressStart: (details) {
+                          _onContinentLongPress(
+                              "Creativity", details, _creativityKey);
+                        },
                       ),
                     ),
                     Positioned(
@@ -132,11 +141,9 @@ class _ContinentMapScrollablePageState
                       child: ContinentChip(
                         key: _careerKey,
                         label: "Career",
-                        onLongPressStart: (details) => _onContinentLongPress(
-                          "Career",
-                          details,
-                          _careerKey,
-                        ),
+                        onLongPressStart: (details) {
+                          _onContinentLongPress("Career", details, _careerKey);
+                        },
                       ),
                     ),
                     Positioned(
@@ -145,68 +152,93 @@ class _ContinentMapScrollablePageState
                       child: ContinentChip(
                         key: _healthKey,
                         label: "Health",
-                        onLongPressStart: (details) => _onContinentLongPress(
-                          "Health",
-                          details,
-                          _healthKey,
-                        ),
+                        onLongPressStart: (details) {
+                          _onContinentLongPress("Health", details, _healthKey);
+                        },
                       ),
                     ),
 
-                    // ピン & 吹き出し（dummyPins から描画）
-                    ...dummyPins.map((pin) {
-                      final cat = pin['category'] as String?;
-                      if (cat == null) return const SizedBox.shrink();
-                      final continentOffset = _continentPositions[cat];
-                      if (continentOffset == null)
-                        return const SizedBox.shrink();
+                    // ★ StreamBuilderを使用してFirebaseからピンを読み込む
+                    StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('pins')
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) {
+                          return const Center(child: Text('データ取得エラー'));
+                        }
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
 
-                      final double pinWorldX =
-                          continentOffset.dx +
-                          (pin['xPosition'] as num).toDouble();
-                      final double pinWorldY =
-                          continentOffset.dy +
-                          (pin['yPosition'] as num).toDouble();
+                        // Firestoreから取得したドキュメントをピンウィジェットに変換
+                        final pinWidgets = snapshot.data!.docs.map((doc) {
+                          final pin = doc.data() as Map<String, dynamic>;
+                          // ★★★ この行を追加 ★★★
+                          print("Firestore category: '${pin['category']}'");
 
-                      final String id = '${pin['userId']}${pin['title']}';
-                      final bool isSelected = _selectedPinId == id;
+                          final String? pinId =
+                              doc.id; // ドキュメントIDをピンのIDとして使用
+                          final Offset? continentOffset =
+                          _continentPositions[pin['category']];
 
-                      return Positioned(
-                        left: pinWorldX,
-                        top: pinWorldY,
-                        child: Stack(
-                          alignment: Alignment.bottomCenter,
-                          clipBehavior: Clip.none,
-                          children: [
-                            if (isSelected)
-                              Positioned(
-                                bottom: 40,
-                                child: PinTooltip(
-                                  title: pin['title'] as String? ?? '',
-                                  description:
-                                      pin['description'] as String? ?? '',
-                                  userId: pin['userId'] as String? ?? '',
+                          // ★★★ この行も追加 ★★★
+                          if (continentOffset == null) {
+                            print(
+                                " continentOffset is null for category: '${pin['category']}'");
+                          }
+
+                          if (continentOffset == null || pinId == null) {
+                            return const SizedBox.shrink();
+                          }
+
+                          // ピンの描画時
+                          final double pinWorldX =
+                              continentOffset.dx + pin['xPosition'];
+                          final double pinWorldY =
+                              continentOffset.dy + pin['yPosition'];
+                          final bool isSelected = _selectedPinId == pinId;
+
+                          return Positioned(
+                            left: pinWorldX,
+                            top: pinWorldY,
+                            child: Stack(
+                              alignment: Alignment.bottomCenter,
+                              clipBehavior: Clip.none,
+                              children: [
+                                if (isSelected)
+                                  Positioned(
+                                    bottom: 40,
+                                    child: PinTooltip(
+                                      title: pin['title'],
+                                      description: pin['description'],
+                                      userId: pin['userId'],
+                                    ),
+                                  ),
+                                InteractiveSparklePin(
+                                  pin: SparklePin(
+                                    baseSize: 18,
+                                    progress: 1.0,
+                                    pulse: true,
+                                  ),
+                                  visualSize: 18,
+                                  stemLen: 12,
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedPinId = isSelected ? null : pinId;
+                                    });
+                                    debugPrint(
+                                        'ピンがタップされました: ${pin['title']}');
+                                  },
                                 ),
-                              ),
-                            InteractiveSparklePin(
-                              pin: const SparklePin(
-                                baseSize: 18,
-                                progress: 1.0,
-                                pulse: true,
-                              ),
-                              visualSize: 18,
-                              stemLen: 12,
-                              onTap: () {
-                                setState(() {
-                                  _selectedPinId = isSelected ? null : id;
-                                });
-                                debugPrint('ピン: ${pin['title']} をタップ');
-                              },
+                              ],
                             ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
+                          );
+                        }).toList();
+                        return Stack(children: pinWidgets);
+                      },
+                    ),
                   ],
                 ),
               ),

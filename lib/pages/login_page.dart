@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:giragiramap/pages/main_screen.dart';
+import 'signup_view.dart';
+import 'continent_map_demo_page.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -11,6 +15,52 @@ class _LoginViewState extends State<LoginView> {
   final _emailC = TextEditingController();
   final _passwordC = TextEditingController();
   bool _obscure = true;
+
+  // ログイン処理を実行する関数
+  Future<void> _signIn() async {
+    // キーボードを閉じる
+    FocusScope.of(context).unfocus();
+
+    try {
+      // メールアドレスとパスワードでサインイン
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailC.text,
+        password: _passwordC.text,
+      );
+
+      if (mounted) { // mountedチェックを追加するとより安全
+        Navigator.pushReplacement( // pushReplacementを使うとログイン画面に戻れなくなる
+          context,
+          MaterialPageRoute(builder: (context) => const MainScreen()),
+        );
+      }
+
+      // ログイン成功後の処理（画面遷移など）はここに書く
+      // この時点ではprintで成功したことだけ確認
+      print('ログインに成功しました！');
+
+    } on FirebaseAuthException catch (e) {
+      // エラーハンドリング
+      String errorMessage = 'ログインに失敗しました。';
+      if (e.code == 'user-not-found') {
+        errorMessage = '指定されたメールアドレスのユーザーは見つかりません。';
+      } else if (e.code == 'wrong-password') {
+        errorMessage = 'パスワードが間違っています。';
+      } else if (e.code == 'invalid-email') {
+        errorMessage = 'メールアドレスの形式が正しくありません。';
+      }
+
+      // 画面下部にエラーメッセージを表示
+      if (mounted) { // widgetが有効な場合のみ実行
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -106,7 +156,7 @@ class _LoginViewState extends State<LoginView> {
                         width: double.infinity,
                         height: 48,
                         child: FilledButton(
-                          onPressed: () {}, // ダミー（後で実装差し替え）
+                          onPressed: _signIn, // ダミー（後で実装差し替え）
                           child: const Text('ログイン'),
                         ),
                       ),
@@ -119,7 +169,7 @@ class _LoginViewState extends State<LoginView> {
                   ),
                 ),
               ),
-
+/*
               const SizedBox(height: 16),
               Row(
                 children: [
@@ -165,14 +215,24 @@ class _LoginViewState extends State<LoginView> {
                     onPressed: () {}, // ダミー
                   ),
                 ),
-
+*/
               const SizedBox(height: 20),
               Wrap(
                 alignment: WrapAlignment.center,
                 spacing: 8,
                 children: [
                   Text('アカウントをお持ちでない方は', style: theme.textTheme.bodyMedium),
-                  TextButton(onPressed: () {}, child: const Text('新規登録')),
+                  TextButton(
+                      onPressed: () {
+                          // SignUpView画面に遷移させる
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const SignUpView(),
+                            ),
+                          );
+                        },
+                        child: const Text('新規登録')
+                  ),
                 ],
               ),
             ],
