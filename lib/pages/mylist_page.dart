@@ -7,11 +7,22 @@ import 'package:firebase_auth/firebase_auth.dart';
 class MyListPage extends StatelessWidget {
   const MyListPage({super.key});
 
-  // ▼▼▼ 表示したいユーザーのIDを固定で指定します ▼▼▼
-  final String currentUserId = 'user_a_id';
-
   @override
   Widget build(BuildContext context) {
+
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('マイリスト'),
+        ),
+        body: const Center(
+          child: Text('マイリストを表示するにはログインしてください。'),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('マイリスト'),
@@ -30,7 +41,7 @@ class MyListPage extends StatelessWidget {
         // 'pins'コレクションから、'userId'が上で指定したIDと一致するドキュメントを取得
         stream: FirebaseFirestore.instance
             .collection('pins')
-            .where('userId', isEqualTo: currentUserId) // ← 固定IDで絞り込み
+            .where('userId', isEqualTo: currentUser.uid) // ← 固定IDで絞り込み
             .snapshots(),
         builder: (context, snapshot) {
           // データ取得中にエラーが発生した場合
@@ -43,7 +54,7 @@ class MyListPage extends StatelessWidget {
           }
           // 該当するデータが1件もなかった場合
           if (snapshot.data!.docs.isEmpty) {
-            return Center(child: Text("ユーザー '$currentUserId' のピンはまだありません"));
+            return Center(child: Text("あなたのピンはまだありません"));
           }
 
           // データが取得できたらListViewで一覧表示
