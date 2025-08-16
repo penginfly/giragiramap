@@ -1,7 +1,9 @@
 // signup_view.dart
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+// ▼▼▼ Firestoreパッケージをインポート ▼▼▼
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:giragiramap/pages/main_screen.dart'; // メイン画面への遷移のために追加
 
 class SignUpView extends StatefulWidget {
   const SignUpView({super.key});
@@ -21,29 +23,36 @@ class _SignUpViewState extends State<SignUpView> {
     super.dispose();
   }
 
-  // 以前作成した登録ロジック
   Future<void> _signUp() async {
-    FocusScope.of(context).unfocus(); // キーボードを閉じる
+    FocusScope.of(context).unfocus();
 
     try {
       // メールアドレスとパスワードでユーザーを作成
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailC.text,
         password: _passwordC.text,
       );
 
-      // 登録成功後、元のログイン画面に戻る
-      if (mounted) {
-        // 登録完了のメッセージを表示
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('登録が完了しました！')),
-        );
-        // 現在の画面を閉じて、前の画面（ログイン画面）に戻る
-        Navigator.of(context).pop();
+      // ▼▼▼ ここから変更 ▼▼▼
+      final user = userCredential.user;
+      if (user != null) {
+        // Firestoreの'user'コレクションにデータを保存
+        await FirebaseFirestore.instance.collection('user').doc(user.uid).set({
+          'userid': user.uid,
+          'email': user.email,
+          // 'createdAt': FieldValue.serverTimestamp(), // 登録日時も保存すると便利
+        });
+
+        // 登録成功後、メイン画面へ直接遷移する
+        if (mounted) {
+          Navigator.of(context).pushReplacement( // pushReplacementでログイン画面に戻れないようにする
+            MaterialPageRoute(builder: (context) => const MainScreen()),
+          );
+        }
       }
+      // ▲▲▲ ここまで変更 ▲▲▲
 
     } on FirebaseAuthException catch (e) {
-      // エラーハンドリング
       String errorMessage = '登録に失敗しました。';
       if (e.code == 'weak-password') {
         errorMessage = 'パスワードが弱すぎます。';
@@ -64,7 +73,6 @@ class _SignUpViewState extends State<SignUpView> {
 
   @override
   Widget build(BuildContext context) {
-    // 登録画面専用のScaffold（画面の土台）を用意
     return Scaffold(
       appBar: AppBar(
         title: const Text('新規登録'),
@@ -95,7 +103,7 @@ class _SignUpViewState extends State<SignUpView> {
                 width: double.infinity,
                 height: 48,
                 child: FilledButton(
-                  onPressed: _signUp, // 作成した登録関数を呼び出す
+                  onPressed: _signUp,
                   child: const Text('登録する'),
                 ),
               ),
