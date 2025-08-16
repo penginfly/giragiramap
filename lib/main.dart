@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'pages/main_screen.dart';
+import 'pages/login_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'pages/auth_gate.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,7 +39,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MainScreen(),
+      home: const AuthGate(),
     );
   }
 }
