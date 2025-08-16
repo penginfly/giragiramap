@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import '../ui/widgets/continent_chip.dart';
 import '../ui/widgets/sparkle_pin.dart';
 import '../ui/widgets/interactive_sparkle_pin.dart';
-import '../../data/dummy_data.dart'; // ダミーデータをインポート
+import '../ui/widgets/pin_tooltip.dart'; // ★ 追加: 吹き出しウィジェット
+import '../../data/dummy_data.dart';
 
 class ContinentMapScrollablePage extends StatefulWidget {
   const ContinentMapScrollablePage({super.key});
@@ -18,12 +19,15 @@ class _ContinentMapScrollablePageState
   static const Size mapSize = Size(2000, 1200);
   static const double pad = 160;
 
+  // 選択されたピンのIDを保持するステート変数
+  String? _selectedPinId;
+
   // 大陸ごとのワールド座標をMapで定義
   final Map<String, Offset> _continentPositions = {
     "Academics": const Offset(300, 250),
-    "Creativity": const Offset(1300, 400),
-    "Career": const Offset(700, 900),
-    "Health": const Offset(1600, 950),
+    "Creativity": const Offset(1300, 300),
+    "Career": const Offset(600, 700),
+    "Health": const Offset(1350, 750),
   };
 
   @override
@@ -78,32 +82,56 @@ class _ContinentMapScrollablePageState
                       child: const ContinentChip(label: "Health"),
                     ),
 
-                    // ---- ここでローカル座標とワールド座標を組み合わせてピンを動的に配置 ----
+                    // ピンと吹き出しを動的に配置
                     ...dummyPins.map((pin) {
-                      // ピンのカテゴリから、対応する大陸のワールド座標を取得
                       final Offset? continentOffset = _continentPositions[pin['category']];
                       if (continentOffset == null) {
-                        return const SizedBox.shrink(); // カテゴリがない場合は何も表示しない
+                        return const SizedBox.shrink();
                       }
 
-                      // 大陸のワールド座標 + ピンのローカル座標 = ピンの最終的なワールド座標
                       final double pinWorldX = continentOffset.dx + pin['xPosition'];
                       final double pinWorldY = continentOffset.dy + pin['yPosition'];
+
+                      // ピンのIDを使い、選択されているか判定
+                      final bool isSelected = _selectedPinId == pin['userId'] + pin['title'];
 
                       return Positioned(
                         left: pinWorldX,
                         top: pinWorldY,
-                        child: InteractiveSparklePin(
-                          pin: SparklePin(
-                            baseSize: 18,
-                            progress: 1.0,
-                            pulse: true,
-                          ),
-                          visualSize: 18,
-                          stemLen: 12,
-                          onTap: () {
-                            debugPrint('ピンがタップされました: ${pin['title']}');
-                          },
+                        // Stackでピンと吹き出しを重ねる
+                        child: Stack(
+                          alignment: Alignment.bottomCenter,
+                          clipBehavior: Clip.none,
+                          children: [
+                            // 吹き出し
+                            if (isSelected)
+                              Positioned(
+                                bottom: 40, // ピンからのオフセット
+                                child: PinTooltip(
+                                  title: pin['title'],
+                                  description: pin['description'],
+                                  userId: pin['userId'],
+                                ),
+                              ),
+
+                            // ピン本体
+                            InteractiveSparklePin(
+                              pin: SparklePin(
+                                baseSize: 18,
+                                progress: 1.0,
+                                pulse: true,
+                              ),
+                              visualSize: 18,
+                              stemLen: 12,
+                              onTap: () {
+                                // タップされたピンのIDをセット
+                                setState(() {
+                                  _selectedPinId = isSelected ? null : pin['userId'] + pin['title'];
+                                });
+                                debugPrint('ピンがタップされました: ${pin['title']}');
+                              },
+                            ),
+                          ],
                         ),
                       );
                     }).toList(),
