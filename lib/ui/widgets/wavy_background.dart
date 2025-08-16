@@ -3,16 +3,18 @@ import 'package:flutter/material.dart';
 
 class TiledWavyBackground extends StatefulWidget {
   final String assetPath;
-  final double amplitude; // 揺れ幅(px)
-  final Duration period; // 往復の周期
-  final double tileScale; // 波タイルの大きさ縮小率 (1.0=原寸)
+  final double amplitude;
+  final Duration period;
+  final double tileScale;
+  final double overscan; // 四辺に足す余白
 
   const TiledWavyBackground({
     super.key,
     required this.assetPath,
     this.amplitude = 12,
     this.period = const Duration(seconds: 3),
-    this.tileScale = 0.3, // 小さくするとタイルが細かくなる
+    this.tileScale = 0.3,
+    this.overscan = 200,
   });
 
   @override
@@ -27,6 +29,15 @@ class _TiledWavyBackgroundState extends State<TiledWavyBackground>
   )..repeat();
 
   @override
+  void didUpdateWidget(covariant TiledWavyBackground oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.period != widget.period) {
+      _ac.duration = widget.period;
+      if (!_ac.isAnimating) _ac.repeat();
+    }
+  }
+
+  @override
   void dispose() {
     _ac.dispose();
     super.dispose();
@@ -37,21 +48,38 @@ class _TiledWavyBackgroundState extends State<TiledWavyBackground>
     return AnimatedBuilder(
       animation: _ac,
       builder: (_, __) {
-        final dx = math.sin(_ac.value * 2 * math.pi) * widget.amplitude;
+        final t = _ac.value * 2 * math.pi;
+        final dx = math.sin(t) * widget.amplitude;
+        final dy = math.cos(t) * (widget.amplitude * 0.25);
 
-        return ClipRect(
-          child: Transform.translate(
-            offset: Offset(dx, 0),
-            child: Transform.scale(
-              scale: 1.05, // はみ出し防止
-              child: Image.asset(
-                widget.assetPath,
-                repeat: ImageRepeat.repeat, // ←ここで敷き詰め！
-                scale: 1 / widget.tileScale, // 小さくして並べる
-                fit: BoxFit.none,
+        return LayoutBuilder(
+          builder: (context, c) {
+            final bleed = widget.amplitude * 2 + 24; // 揺れ対策
+            final pad = bleed + widget.overscan; // 追加余白
+            final w = c.maxWidth + pad * 2;
+            final h = c.maxHeight + pad * 2;
+
+            return IgnorePointer(
+              child: Transform.translate(
+                offset: Offset(-pad + dx, -pad + dy),
+                child: OverflowBox(
+                  // ← はみ出しOKにする
+                  minWidth: w,
+                  maxWidth: w,
+                  minHeight: h,
+                  maxHeight: h,
+                  alignment: Alignment.topLeft,
+                  child: Image.asset(
+                    widget.assetPath,
+                    repeat: ImageRepeat.repeat,
+                    scale: 1 / widget.tileScale,
+                    fit: BoxFit.none,
+                    filterQuality: FilterQuality.low,
+                  ),
+                ),
               ),
-            ),
-          ),
+            );
+          },
         );
       },
     );

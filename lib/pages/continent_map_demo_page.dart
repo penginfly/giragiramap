@@ -6,7 +6,7 @@ import '../ui/widgets/sparkle_pin.dart';
 import '../ui/widgets/interactive_sparkle_pin.dart';
 import '../ui/widgets/pin_tooltip.dart';
 import '../ui/widgets/pin_creation_modal.dart';
-import '../../data/dummy_data.dart'; // ダミーデータはまだ使用
+import '../ui/widgets/wavy_background.dart';
 
 class ContinentMapScrollablePage extends StatefulWidget {
   const ContinentMapScrollablePage({super.key});
@@ -37,13 +37,15 @@ class _ContinentMapScrollablePageState
 
   // onLongPress コールバックで呼び出される関数
   void _onContinentLongPress(
-      String category,
-      LongPressStartDetails details,
-      GlobalKey key,
-      ) {
+    String category,
+    LongPressStartDetails details,
+    GlobalKey key,
+  ) {
     final RenderBox renderBox =
-    key.currentContext!.findRenderObject() as RenderBox;
-    final Offset localPosition = renderBox.globalToLocal(details.globalPosition);
+        key.currentContext!.findRenderObject() as RenderBox;
+    final Offset localPosition = renderBox.globalToLocal(
+      details.globalPosition,
+    );
 
     print('長押しされた大陸: $category');
     print('大陸内のローカル座標: $localPosition');
@@ -99,6 +101,17 @@ class _ContinentMapScrollablePageState
               const Positioned.fill(
                 child: ColoredBox(color: Color(0xFF87CEEB)),
               ),
+              Positioned.fill(child: ColoredBox(color: Color(0xFF87CEEB))),
+              // キャンバス全面を海に
+              Positioned.fill(
+                child: TiledWavyBackground(
+                  assetPath: 'assets/images/wave.png',
+                  tileScale: 0.30,
+                  amplitude: 12,
+                  overscan: 200, // 好みで増減
+                  period: const Duration(seconds: 3),
+                ),
+              ),
               Positioned(
                 left: pad,
                 top: pad,
@@ -106,10 +119,6 @@ class _ContinentMapScrollablePageState
                 height: mapSize.height,
                 child: Stack(
                   children: [
-                    const Positioned.fill(
-                      child: ColoredBox(color: Color(0xFF87CEEB)),
-                    ),
-
                     // 大陸チップを配置
                     Positioned(
                       left: _continentPositions["Academics"]!.dx,
@@ -119,7 +128,10 @@ class _ContinentMapScrollablePageState
                         label: "Academics",
                         onLongPressStart: (details) {
                           _onContinentLongPress(
-                              "Academics", details, _academicsKey);
+                            "Academics",
+                            details,
+                            _academicsKey,
+                          );
                         },
                       ),
                     ),
@@ -131,7 +143,10 @@ class _ContinentMapScrollablePageState
                         label: "Creativity",
                         onLongPressStart: (details) {
                           _onContinentLongPress(
-                              "Creativity", details, _creativityKey);
+                            "Creativity",
+                            details,
+                            _creativityKey,
+                          );
                         },
                       ),
                     ),
@@ -169,7 +184,9 @@ class _ContinentMapScrollablePageState
                         }
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator());
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
                         }
 
                         // Firestoreから取得したドキュメントをピンウィジェットに変換
@@ -178,15 +195,15 @@ class _ContinentMapScrollablePageState
                           // ★★★ この行を追加 ★★★
                           print("Firestore category: '${pin['category']}'");
 
-                          final String? pinId =
-                              doc.id; // ドキュメントIDをピンのIDとして使用
+                          final String? pinId = doc.id; // ドキュメントIDをピンのIDとして使用
                           final Offset? continentOffset =
-                          _continentPositions[pin['category']];
+                              _continentPositions[pin['category']];
 
                           // ★★★ この行も追加 ★★★
                           if (continentOffset == null) {
                             print(
-                                " continentOffset is null for category: '${pin['category']}'");
+                              " continentOffset is null for category: '${pin['category']}'",
+                            );
                           }
 
                           if (continentOffset == null || pinId == null) {
@@ -226,10 +243,11 @@ class _ContinentMapScrollablePageState
                                   stemLen: 12,
                                   onTap: () {
                                     setState(() {
-                                      _selectedPinId = isSelected ? null : pinId;
+                                      _selectedPinId = isSelected
+                                          ? null
+                                          : pinId;
                                     });
-                                    debugPrint(
-                                        'ピンがタップされました: ${pin['title']}');
+                                    debugPrint('ピンがタップされました: ${pin['title']}');
                                   },
                                 ),
                               ],
