@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'signup_view.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -119,7 +121,7 @@ class _LoginViewState extends State<LoginView> {
                   ),
                 ),
               ),
-
+/*
               const SizedBox(height: 16),
               Row(
                 children: [
@@ -165,14 +167,24 @@ class _LoginViewState extends State<LoginView> {
                     onPressed: () {}, // ダミー
                   ),
                 ),
-
+*/
               const SizedBox(height: 20),
               Wrap(
                 alignment: WrapAlignment.center,
                 spacing: 8,
                 children: [
                   Text('アカウントをお持ちでない方は', style: theme.textTheme.bodyMedium),
-                  TextButton(onPressed: () {}, child: const Text('新規登録')),
+                  TextButton(
+                      onPressed: () {
+                          // SignUpView画面に遷移させる
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const SignUpView(),
+                            ),
+                          );
+                        },
+                        child: const Text('新規登録')
+                  ),
                 ],
               ),
             ],
