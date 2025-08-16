@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'mylist_page.dart';
 import 'continent_map_demo_page.dart';
+import 'login_page.dart'; // 右側のユーザーページ（仮）
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -15,7 +16,7 @@ class _MainScreenState extends State<MainScreen> {
   final _pages = const [
     MyListPage(), // 左：リスト（中身だけ）
     ContinentMapScrollablePage(), // 中：マップ（中身だけに揃えるのが◎）
-    UserPage(), // 右：ユーザー（中身だけ）
+    LoginView(), // 右：ユーザー（中身だけ）
   ];
 
   @override
@@ -34,10 +35,4 @@ class _MainScreenState extends State<MainScreen> {
       ),
     );
   }
-}
-
-class UserPage extends StatelessWidget {
-  const UserPage({super.key});
-  @override
-  Widget build(BuildContext context) => const Center(child: Text("User Page"));
 }
