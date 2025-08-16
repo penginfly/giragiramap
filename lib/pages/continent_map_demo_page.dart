@@ -1,6 +1,6 @@
 // continent_map_demo_page.dart
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // ★ 追加
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../ui/widgets/continent_chip.dart';
 import '../ui/widgets/sparkle_pin.dart';
 import '../ui/widgets/interactive_sparkle_pin.dart';
@@ -142,8 +142,7 @@ class _ContinentMapScrollablePageState
                         key: _careerKey,
                         label: "Career",
                         onLongPressStart: (details) {
-                          _onContinentLongPress(
-                              "Career", details, _careerKey);
+                          _onContinentLongPress("Career", details, _careerKey);
                         },
                       ),
                     ),
@@ -154,20 +153,22 @@ class _ContinentMapScrollablePageState
                         key: _healthKey,
                         label: "Health",
                         onLongPressStart: (details) {
-                          _onContinentLongPress(
-                              "Health", details, _healthKey);
+                          _onContinentLongPress("Health", details, _healthKey);
                         },
                       ),
                     ),
 
                     // ★ StreamBuilderを使用してFirebaseからピンを読み込む
                     StreamBuilder<QuerySnapshot>(
-                      stream: FirebaseFirestore.instance.collection('pins').snapshots(),
+                      stream: FirebaseFirestore.instance
+                          .collection('pins')
+                          .snapshots(),
                       builder: (context, snapshot) {
                         if (snapshot.hasError) {
                           return const Center(child: Text('データ取得エラー'));
                         }
-                        if (snapshot.connectionState == ConnectionState.waiting) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
                           return const Center(child: CircularProgressIndicator());
                         }
 
@@ -177,22 +178,26 @@ class _ContinentMapScrollablePageState
                           // ★★★ この行を追加 ★★★
                           print("Firestore category: '${pin['category']}'");
 
-                          final String? pinId = doc.id; // ドキュメントIDをピンのIDとして使用
-                          final Offset? continentOffset = _continentPositions[pin['category']];
+                          final String? pinId =
+                              doc.id; // ドキュメントIDをピンのIDとして使用
+                          final Offset? continentOffset =
+                          _continentPositions[pin['category']];
 
                           // ★★★ この行も追加 ★★★
                           if (continentOffset == null) {
-                            print(" continentOffset is null for category: '${pin['category']}'");
+                            print(
+                                " continentOffset is null for category: '${pin['category']}'");
                           }
-
 
                           if (continentOffset == null || pinId == null) {
                             return const SizedBox.shrink();
                           }
 
                           // ピンの描画時
-                          final double pinWorldX = continentOffset.dx + pin['xPosition'];
-                          final double pinWorldY = continentOffset.dy + pin['yPosition'];
+                          final double pinWorldX =
+                              continentOffset.dx + pin['xPosition'];
+                          final double pinWorldY =
+                              continentOffset.dy + pin['yPosition'];
                           final bool isSelected = _selectedPinId == pinId;
 
                           return Positioned(
@@ -223,7 +228,8 @@ class _ContinentMapScrollablePageState
                                     setState(() {
                                       _selectedPinId = isSelected ? null : pinId;
                                     });
-                                    debugPrint('ピンがタップされました: ${pin['title']}');
+                                    debugPrint(
+                                        'ピンがタップされました: ${pin['title']}');
                                   },
                                 ),
                               ],
