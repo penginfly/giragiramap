@@ -14,8 +14,8 @@ class ContinentChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         onTap: onTap,
         child: Container(
-          width: 400, // 横幅ちょっと広め
-          height: 200, // 縦幅をしっかり大きく
+          width: 600, // 横幅ちょっと広め
+          height: 400, // 縦幅をしっかり大きく
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: Colors.lightGreenAccent.shade100, // パステル黄緑
