@@ -2,7 +2,8 @@
 import 'package:flutter/material.dart';
 import 'mylist_page.dart';
 import 'continent_map_demo_page.dart';
-import 'login_page.dart'; // 右側のユーザーページ（仮）
+import 'login_page.dart';
+
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:giragiramap/pages/main_screen.dart';
 import 'signup_view.dart';
 import 'continent_map_demo_page.dart';
 
@@ -30,7 +31,7 @@ class _LoginViewState extends State<LoginView> {
       if (mounted) { // mountedチェックを追加するとより安全
         Navigator.pushReplacement( // pushReplacementを使うとログイン画面に戻れなくなる
           context,
-          MaterialPageRoute(builder: (context) => const ContinentMapScrollablePage()),
+          MaterialPageRoute(builder: (context) => const MainScreen()),
         );
       }
 
