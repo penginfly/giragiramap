@@ -6,6 +6,7 @@ import '../ui/widgets/interactive_sparkle_pin.dart';
 import '../ui/widgets/pin_tooltip.dart';
 import '../../data/dummy_data.dart';
 import '../ui/widgets/pin_creation_modal.dart';
+import '../ui/widgets/wavy_background.dart'; // ← 追加
 
 class ContinentMapScrollablePage extends StatefulWidget {
   const ContinentMapScrollablePage({super.key});
@@ -17,64 +18,57 @@ class ContinentMapScrollablePage extends StatefulWidget {
 
 class _ContinentMapScrollablePageState
     extends State<ContinentMapScrollablePage> {
-  // GlobalKeyの定義
+  // 大陸の座標など（変更なし）
   final GlobalKey _academicsKey = GlobalKey();
   final GlobalKey _creativityKey = GlobalKey();
   final GlobalKey _careerKey = GlobalKey();
   final GlobalKey _healthKey = GlobalKey();
+
   static const Size mapSize = Size(2000, 1200);
   static const double pad = 160;
   String? _selectedPinId;
 
-  // 大陸ごとのワールド座標をMapで定義
-  final Map<String, Offset> _continentPositions = {
-    "Academics": const Offset(300, 250),
-    "Creativity": const Offset(1300, 300),
-    "Career": const Offset(600, 700),
-    "Health": const Offset(1350, 750),
+  final Map<String, Offset> _continentPositions = const {
+    "Academics": Offset(300, 250),
+    "Creativity": Offset(1300, 300),
+    "Career": Offset(600, 700),
+    "Health": Offset(1350, 750),
   };
 
-  // onLongPress コールバックで呼び出される関数
+  // 大陸長押し → モーダル起動（変更なし）
   void _onContinentLongPress(
-      String category,
-      LongPressStartDetails details,
-      GlobalKey key,
-      ) {
-    final RenderBox renderBox = key.currentContext!.findRenderObject() as RenderBox;
-    final Offset localPosition = renderBox.globalToLocal(details.globalPosition);
-
-    print('長押しされた大陸: $category');
-    print('大陸内のローカル座標: $localPosition');
-
-    // ★ ここでモーダル画面を呼び出す
+    String category,
+    LongPressStartDetails details,
+    GlobalKey key,
+  ) {
+    final renderBox = key.currentContext!.findRenderObject() as RenderBox;
+    final localPosition = renderBox.globalToLocal(details.globalPosition);
     _showPinCreationModal(category, localPosition);
   }
 
-  void _showPinCreationModal(String category, Offset localPosition) async {
+  Future<void> _showPinCreationModal(
+    String category,
+    Offset localPosition,
+  ) async {
     final newPinData = await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (BuildContext context) {
         return PinCreationModal(
-          category: category, // ★ 修正: initialCategoryからcategoryに変更
+          category: category,
           initialPosition: localPosition,
         );
       },
     );
 
-    // モーダルが閉じられ、データが返された場合
     if (newPinData != null) {
-      setState(() {
-        // ダミーデータリストに新しいピンを追加
-        dummyPins.add(newPinData);
-      });
+      setState(() => dummyPins.add(newPinData));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF87CEEB),
       body: InteractiveViewer(
         minScale: 0.5,
         maxScale: 2.5,
@@ -86,29 +80,37 @@ class _ContinentMapScrollablePageState
           height: mapSize.height + pad * 2,
           child: Stack(
             children: [
+              // ← ここを差し替え：1枚画像を左右スライドで“波”
               const Positioned.fill(
-                child: ColoredBox(color: Color(0xFF87CEEB)),
+                child: TiledWavyBackground(
+                  assetPath: "assets/images/wave.png",
+                  amplitude: 8, // 揺れ幅
+                  period: Duration(seconds: 4), // 往復4秒
+                  tileScale: 0.3, // 波の粒を細かく
+                ),
               ),
+
+              // マップ本体（大陸・ピンはそのまま）
               Positioned(
                 left: pad,
                 top: pad,
                 width: mapSize.width,
                 height: mapSize.height,
                 child: Stack(
+                  clipBehavior: Clip.none,
                   children: [
-                    const Positioned.fill(
-                      child: ColoredBox(color: Color(0xFF87CEEB)),
-                    ),
-                    // 大陸チップを配置
+                    // 大陸チップ群（変えてません）
                     Positioned(
                       left: _continentPositions["Academics"]!.dx,
                       top: _continentPositions["Academics"]!.dy,
                       child: ContinentChip(
                         key: _academicsKey,
                         label: "Academics",
-                        onLongPressStart: (details) {
-                          _onContinentLongPress("Academics", details, _academicsKey);
-                        },
+                        onLongPressStart: (details) => _onContinentLongPress(
+                          "Academics",
+                          details,
+                          _academicsKey,
+                        ),
                       ),
                     ),
                     Positioned(
@@ -117,9 +119,11 @@ class _ContinentMapScrollablePageState
                       child: ContinentChip(
                         key: _creativityKey,
                         label: "Creativity",
-                        onLongPressStart: (details) {
-                          _onContinentLongPress("Creativity", details, _creativityKey);
-                        },
+                        onLongPressStart: (details) => _onContinentLongPress(
+                          "Creativity",
+                          details,
+                          _creativityKey,
+                        ),
                       ),
                     ),
                     Positioned(
@@ -128,9 +132,11 @@ class _ContinentMapScrollablePageState
                       child: ContinentChip(
                         key: _careerKey,
                         label: "Career",
-                        onLongPressStart: (details) {
-                          _onContinentLongPress("Career", details, _careerKey);
-                        },
+                        onLongPressStart: (details) => _onContinentLongPress(
+                          "Career",
+                          details,
+                          _careerKey,
+                        ),
                       ),
                     ),
                     Positioned(
@@ -139,24 +145,32 @@ class _ContinentMapScrollablePageState
                       child: ContinentChip(
                         key: _healthKey,
                         label: "Health",
-                        onLongPressStart: (details) {
-                          _onContinentLongPress("Health", details, _healthKey);
-                        },
+                        onLongPressStart: (details) => _onContinentLongPress(
+                          "Health",
+                          details,
+                          _healthKey,
+                        ),
                       ),
                     ),
-                    // ピンと吹き出しを動的に配置
+
+                    // ピン & 吹き出し（dummyPins から描画）
                     ...dummyPins.map((pin) {
-                      final Offset? continentOffset =
-                      _continentPositions[pin['category']];
-                      if (continentOffset == null) {
+                      final cat = pin['category'] as String?;
+                      if (cat == null) return const SizedBox.shrink();
+                      final continentOffset = _continentPositions[cat];
+                      if (continentOffset == null)
                         return const SizedBox.shrink();
-                      }
+
                       final double pinWorldX =
-                          continentOffset.dx + pin['xPosition'];
+                          continentOffset.dx +
+                          (pin['xPosition'] as num).toDouble();
                       final double pinWorldY =
-                          continentOffset.dy + pin['yPosition'];
-                      final bool isSelected =
-                          _selectedPinId == pin['userId'] + pin['title'];
+                          continentOffset.dy +
+                          (pin['yPosition'] as num).toDouble();
+
+                      final String id = '${pin['userId']}${pin['title']}';
+                      final bool isSelected = _selectedPinId == id;
+
                       return Positioned(
                         left: pinWorldX,
                         top: pinWorldY,
@@ -168,13 +182,14 @@ class _ContinentMapScrollablePageState
                               Positioned(
                                 bottom: 40,
                                 child: PinTooltip(
-                                  title: pin['title'],
-                                  description: pin['description'],
-                                  userId: pin['userId'],
+                                  title: pin['title'] as String? ?? '',
+                                  description:
+                                      pin['description'] as String? ?? '',
+                                  userId: pin['userId'] as String? ?? '',
                                 ),
                               ),
                             InteractiveSparklePin(
-                              pin: SparklePin(
+                              pin: const SparklePin(
                                 baseSize: 18,
                                 progress: 1.0,
                                 pulse: true,
@@ -183,11 +198,9 @@ class _ContinentMapScrollablePageState
                               stemLen: 12,
                               onTap: () {
                                 setState(() {
-                                  _selectedPinId = isSelected
-                                      ? null
-                                      : pin['userId'] + pin['title'];
+                                  _selectedPinId = isSelected ? null : id;
                                 });
-                                debugPrint('ピンがタップされました: ${pin['title']}');
+                                debugPrint('ピン: ${pin['title']} をタップ');
                               },
                             ),
                           ],
