@@ -1,55 +1,72 @@
 // lib/pages/mylist_page.dart
 import 'package:flutter/material.dart';
-import '../data/dummy_data.dart';
+// Firestoreと連携するためにパッケージをインポート
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class MyListPage extends StatelessWidget {
   const MyListPage({super.key});
 
+  // ▼▼▼ 表示したいユーザーのIDを固定で指定します ▼▼▼
   final String currentUserId = 'user_a_id';
 
   @override
   Widget build(BuildContext context) {
-    final myPins = dummyPins
-        .where((p) => p['userId'] == currentUserId)
-        .toList();
-
-    // ▼▼▼ Start of changes ▼▼▼
-    // Wrap the ListView with a Scaffold widget
     return Scaffold(
-      // Add an AppBar to the top of the screen
       appBar: AppBar(
-        // Add a list of action buttons to the right of the title
+        title: const Text('マイリスト'),
         actions: [
-          // Add a logout icon button
           IconButton(
             icon: const Icon(Icons.logout),
-            tooltip: 'Logout', // Optional: shows a label on long-press
+            tooltip: 'Logout',
             onPressed: () {
-              // Call the signOut method from FirebaseAuth
               FirebaseAuth.instance.signOut();
-              // Your AuthGate will automatically handle the screen transition
             },
           ),
         ],
       ),
-      // Set the ListView as the main content of the screen
-      body: ListView.builder(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        itemCount: myPins.length,
-        itemBuilder: (context, index) {
-          final pin = myPins[index];
-          return Card(
-            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            child: ListTile(
-              title: Text(pin['title']),
-              subtitle: Text(pin['description']),
-              trailing: Text(pin['category']),
-            ),
+      // ▼▼▼ StreamBuilderを使ってFirestoreのデータを購読 ▼▼▼
+      body: StreamBuilder<QuerySnapshot>(
+        // 'pins'コレクションから、'userId'が上で指定したIDと一致するドキュメントを取得
+        stream: FirebaseFirestore.instance
+            .collection('pins')
+            .where('userId', isEqualTo: currentUserId) // ← 固定IDで絞り込み
+            .snapshots(),
+        builder: (context, snapshot) {
+          // データ取得中にエラーが発生した場合
+          if (snapshot.hasError) {
+            return const Center(child: Text('エラーが発生しました'));
+          }
+          // データ取得中はローディングインジケーターを表示
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          // 該当するデータが1件もなかった場合
+          if (snapshot.data!.docs.isEmpty) {
+            return Center(child: Text("ユーザー '$currentUserId' のピンはまだありません"));
+          }
+
+          // データが取得できたらListViewで一覧表示
+          return ListView.builder(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            itemCount: snapshot.data!.docs.length, // ドキュメントの数
+            itemBuilder: (context, index) {
+              // Firestoreのドキュメントからデータを取得
+              final doc = snapshot.data!.docs[index];
+              final pin = doc.data() as Map<String, dynamic>;
+
+              return Card(
+                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                child: ListTile(
+                  title: Text(pin['title']),
+                  subtitle: Text(pin['description']),
+                  trailing: Text(pin['category']),
+                ),
+              );
+            },
           );
         },
       ),
     );
-    // ▲▲▲ End of changes ▲▲▲
   }
 }
