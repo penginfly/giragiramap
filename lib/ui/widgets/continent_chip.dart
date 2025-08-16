@@ -1,31 +1,24 @@
-// lib/ui/widgets/continent_chip.dart
 import 'package:flutter/material.dart';
 
 class ContinentChip extends StatelessWidget {
   final String label;
   final VoidCallback? onTap;
-  final GestureLongPressStartCallback? onLongPressStart;
 
-  const ContinentChip({
-    super.key,
-    required this.label,
-    this.onTap,
-    this.onLongPressStart,
-  });
+  const ContinentChip({super.key, required this.label, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
-      child: GestureDetector(
+      child: InkWell(
+        borderRadius: BorderRadius.circular(24),
         onTap: onTap,
-        onLongPressStart: onLongPressStart,
         child: Container(
-          width: 600,
-          height: 400,
+          width: 600, // 横幅ちょっと広め
+          height: 400, // 縦幅をしっかり大きく
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: Colors.lightGreenAccent.shade100,
+            color: Colors.lightGreenAccent.shade100, // パステル黄緑
             borderRadius: BorderRadius.circular(24),
             boxShadow: const [
               BoxShadow(
@@ -38,9 +31,9 @@ class ContinentChip extends StatelessWidget {
           child: Text(
             label,
             style: const TextStyle(
-              fontSize: 24,
+              fontSize: 24, // 大きめの文字
               fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              color: Colors.black87, // 黒字で可読性UP
             ),
           ),
         ),
