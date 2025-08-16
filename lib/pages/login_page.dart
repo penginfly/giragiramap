@@ -1,0 +1,184 @@
+import 'package:flutter/material.dart';
+
+class LoginView extends StatefulWidget {
+  const LoginView({super.key});
+
+  @override
+  State<LoginView> createState() => _LoginViewState();
+}
+
+class _LoginViewState extends State<LoginView> {
+  final _emailC = TextEditingController();
+  final _passwordC = TextEditingController();
+  bool _obscure = true;
+
+  @override
+  void dispose() {
+    _emailC.dispose();
+    _passwordC.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    // 親(MainScreen)がScaffold + BottomNavを持つので、ここは“中身だけ”
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 460),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // ロゴ・タイトル（見た目だけ）
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withOpacity(.08),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Icon(
+                  Icons.public,
+                  size: 44,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Welcome back',
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'ログインして続けましょう',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.textTheme.bodyMedium?.color?.withOpacity(.7),
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // 入力フォーム（見た目だけ・バリデーション無し）
+              Card(
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  side: BorderSide(color: theme.dividerColor.withOpacity(.2)),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      TextField(
+                        controller: _emailC,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: const InputDecoration(
+                          labelText: 'メールアドレス',
+                          prefixIcon: Icon(Icons.alternate_email),
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      TextField(
+                        controller: _passwordC,
+                        keyboardType: TextInputType.visiblePassword,
+                        obscureText: _obscure,
+                        decoration: InputDecoration(
+                          labelText: 'パスワード',
+                          prefixIcon: const Icon(Icons.lock_outline),
+                          border: const OutlineInputBorder(),
+                          suffixIcon: IconButton(
+                            onPressed: () =>
+                                setState(() => _obscure = !_obscure),
+                            icon: Icon(
+                              _obscure
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: FilledButton(
+                          onPressed: () {}, // ダミー（後で実装差し替え）
+                          child: const Text('ログイン'),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      TextButton(
+                        onPressed: () {}, // ダミー
+                        child: const Text('パスワードをお忘れですか？'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: Divider(color: theme.dividerColor.withOpacity(.4)),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Text(
+                      'または',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.textTheme.bodySmall?.color?.withOpacity(
+                          .7,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Divider(color: theme.dividerColor.withOpacity(.4)),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // ソーシャルログイン（見た目だけ）
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: OutlinedButton.icon(
+                  icon: const Icon(Icons.login),
+                  label: const Text('Googleでログイン'),
+                  onPressed: () {}, // ダミー
+                ),
+              ),
+              const SizedBox(height: 10),
+              if (Theme.of(context).platform == TargetPlatform.iOS)
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: OutlinedButton.icon(
+                    icon: const Icon(Icons.apple),
+                    label: const Text('Appleでログイン'),
+                    onPressed: () {}, // ダミー
+                  ),
+                ),
+
+              const SizedBox(height: 20),
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 8,
+                children: [
+                  Text('アカウントをお持ちでない方は', style: theme.textTheme.bodyMedium),
+                  TextButton(onPressed: () {}, child: const Text('新規登録')),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
