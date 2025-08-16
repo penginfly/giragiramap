@@ -11,29 +11,30 @@ class ContinentChip extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(24),
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          width: 220, // 横幅ちょっと広め
+          height: 120, // 縦幅をしっかり大きく
+          alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.9),
-            borderRadius: BorderRadius.circular(14),
+            color: Colors.lightGreenAccent.shade100, // パステル黄緑
+            borderRadius: BorderRadius.circular(24),
             boxShadow: const [
               BoxShadow(
                 color: Colors.black26,
-                blurRadius: 8,
-                offset: Offset(0, 2),
+                blurRadius: 12,
+                offset: Offset(0, 6),
               ),
             ],
-            border: Border.all(color: Colors.black12),
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.public, size: 16),
-              const SizedBox(width: 6),
-              Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
-            ],
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontSize: 24, // 大きめの文字
+              fontWeight: FontWeight.bold,
+              color: Colors.black87, // 黒字で可読性UP
+            ),
           ),
         ),
       ),
