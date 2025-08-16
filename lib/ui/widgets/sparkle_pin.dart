@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import '../theme/colors.dart';
+import 'package:giragiramap/theme/colors.dart';
 
 class SparklePin extends StatefulWidget {
   final double baseSize; // 16〜24くらい
