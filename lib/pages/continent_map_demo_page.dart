@@ -34,7 +34,6 @@ class _ContinentMapScrollablePageState
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF87CEEB),
-      appBar: AppBar(title: const Text("Continent Map (Pan/Zoom)")),
       body: InteractiveViewer(
         minScale: 0.5,
         maxScale: 2.5,
@@ -84,16 +83,20 @@ class _ContinentMapScrollablePageState
 
                     // ピンと吹き出しを動的に配置
                     ...dummyPins.map((pin) {
-                      final Offset? continentOffset = _continentPositions[pin['category']];
+                      final Offset? continentOffset =
+                          _continentPositions[pin['category']];
                       if (continentOffset == null) {
                         return const SizedBox.shrink();
                       }
 
-                      final double pinWorldX = continentOffset.dx + pin['xPosition'];
-                      final double pinWorldY = continentOffset.dy + pin['yPosition'];
+                      final double pinWorldX =
+                          continentOffset.dx + pin['xPosition'];
+                      final double pinWorldY =
+                          continentOffset.dy + pin['yPosition'];
 
                       // ピンのIDを使い、選択されているか判定
-                      final bool isSelected = _selectedPinId == pin['userId'] + pin['title'];
+                      final bool isSelected =
+                          _selectedPinId == pin['userId'] + pin['title'];
 
                       return Positioned(
                         left: pinWorldX,
@@ -126,7 +129,9 @@ class _ContinentMapScrollablePageState
                               onTap: () {
                                 // タップされたピンのIDをセット
                                 setState(() {
-                                  _selectedPinId = isSelected ? null : pin['userId'] + pin['title'];
+                                  _selectedPinId = isSelected
+                                      ? null
+                                      : pin['userId'] + pin['title'];
                                 });
                                 debugPrint('ピンがタップされました: ${pin['title']}');
                               },
