@@ -30,7 +30,6 @@ class _ContinentMapScrollablePageState
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF87CEEB),
-      appBar: AppBar(title: const Text("Continent Map (Pan/Zoom)")),
       body: InteractiveViewer(
         minScale: 0.5,
         maxScale: 2.5,
@@ -81,14 +80,17 @@ class _ContinentMapScrollablePageState
                     // ---- ここでローカル座標とワールド座標を組み合わせてピンを動的に配置 ----
                     ...dummyPins.map((pin) {
                       // ピンのカテゴリから、対応する大陸のワールド座標を取得
-                      final Offset? continentOffset = _continentPositions[pin['category']];
+                      final Offset? continentOffset =
+                          _continentPositions[pin['category']];
                       if (continentOffset == null) {
                         return const SizedBox.shrink(); // カテゴリがない場合は何も表示しない
                       }
 
                       // 大陸のワールド座標 + ピンのローカル座標 = ピンの最終的なワールド座標
-                      final double pinWorldX = continentOffset.dx + pin['xPosition'];
-                      final double pinWorldY = continentOffset.dy + pin['yPosition'];
+                      final double pinWorldX =
+                          continentOffset.dx + pin['xPosition'];
+                      final double pinWorldY =
+                          continentOffset.dy + pin['yPosition'];
 
                       return Positioned(
                         left: pinWorldX,
