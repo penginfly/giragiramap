@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import '../ui/widgets/continent_chip.dart';
+import '../ui/widgets/continent_chip.dart'; // ← 旗のみ表示版に更新済みのものを使用
 import '../ui/widgets/sparkle_pin.dart';
 import '../ui/widgets/interactive_sparkle_pin.dart';
 import '../ui/widgets/pin_tooltip.dart';
@@ -20,21 +20,41 @@ class ContinentMapScrollablePage extends StatefulWidget {
 
 class _ContinentMapScrollablePageState
     extends State<ContinentMapScrollablePage> {
+  // ==== 島メタ（旗だけ） ====
+  // アセット名は手元のファイルに合わせて調整してください
+  static const islands = <IslandMeta>[
+    IslandMeta(flagAsset: 'assets/flags/flag_academics.png'), // 0
+    IslandMeta(flagAsset: 'assets/flags/flag_creativity.png'), // 1
+    IslandMeta(flagAsset: 'assets/flags/flag_career.png'), // 2
+    IslandMeta(flagAsset: 'assets/flags/flag_health.png'), // 3
+  ];
+
+  // Firestore で使うカテゴリ文字列（従来互換）
+  static const categories = <String>[
+    'Academics',
+    'Creativity',
+    'Career',
+    'Health',
+  ];
+
+  // キー（長押し位置計算用）
   final GlobalKey _academicsKey = GlobalKey();
   final GlobalKey _creativityKey = GlobalKey();
   final GlobalKey _careerKey = GlobalKey();
   final GlobalKey _healthKey = GlobalKey();
 
+  // マップサイズ＆余白
   static const Size mapSize = Size(2000, 1200);
   static const double pad = 160;
 
   String? _selectedPinId;
 
+  // 島の基準座標（左上）
   final Map<String, Offset> _continentPositions = const {
-    "Academics": Offset(300, 250),
-    "Creativity": Offset(1300, 300),
-    "Career": Offset(600, 700),
-    "Health": Offset(1350, 750),
+    'Academics': Offset(300, 0),
+    'Creativity': Offset(1300, 400),
+    'Career': Offset(600, 700),
+    'Health': Offset(1500, 900),
   };
 
   void _onContinentLongPress(
@@ -70,7 +90,7 @@ class _ContinentMapScrollablePageState
       await FirebaseFirestore.instance.collection('pins').add({
         'title': newPinData['title'],
         'description': newPinData['description'],
-        'category': newPinData['category'],
+        'category': newPinData['category'], // categories のいずれか
         'userId': currentUser.uid,
         'xPosition': newPinData['xPosition'],
         'yPosition': newPinData['yPosition'],
@@ -82,7 +102,7 @@ class _ContinentMapScrollablePageState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // ベース色（波画像の“隙間”が万一見えても目立たないように海色）
+      // ベース色（波タイルの隙間が見えても目立たない海色）
       backgroundColor: const Color(0xFF87CEEB),
       body: InteractiveViewer(
         minScale: 0.5,
@@ -115,66 +135,75 @@ class _ContinentMapScrollablePageState
                 child: Stack(
                   clipBehavior: Clip.none,
                   children: [
-                    // --- 大陸（基礎デザイン：砂→草の二層・デフォルトアセットを使用） ---
+                    // --- 島（テキスト無し／旗だけ） ---
                     Positioned(
-                      left: _continentPositions["Academics"]!.dx,
-                      top: _continentPositions["Academics"]!.dy,
+                      left: _continentPositions['Academics']!.dx,
+                      top: _continentPositions['Academics']!.dy,
                       child: ContinentChip(
                         key: _academicsKey,
-                        label: "Academics",
+                        islandIndex: 0, // ← インデックスで指定
+                        islands: islands,
                         onLongPressStart: (d) => _onContinentLongPress(
-                          "Academics",
+                          categories[0], // 'Academics'
                           d,
                           _academicsKey,
                         ),
-                        // 必要なら下の2つで明示指定（assets/patterns）
-                        // grassPatternAsset: "assets/patterns/grass_tile.png",
-                        // sandPatternAsset:  "assets/patterns/sand_tile.png",
                         tileScale: 0.32,
                         radius: 48,
                         size: const Size(520, 360),
+                        flagSize: 300, // 旗サイズ調整OK
+                        flagPadding: const EdgeInsets.fromLTRB(-30, -180, 0, 0),
                       ),
                     ),
                     Positioned(
-                      left: _continentPositions["Creativity"]!.dx,
-                      top: _continentPositions["Creativity"]!.dy,
+                      left: _continentPositions['Creativity']!.dx,
+                      top: _continentPositions['Creativity']!.dy,
                       child: ContinentChip(
                         key: _creativityKey,
-                        label: "Creativity",
+                        islandIndex: 1,
+                        islands: islands,
                         onLongPressStart: (d) => _onContinentLongPress(
-                          "Creativity",
+                          categories[1],
                           d,
                           _creativityKey,
                         ),
                         tileScale: 0.32,
                         radius: 48,
                         size: const Size(520, 360),
+                        flagSize: 300,
+                        flagPadding: const EdgeInsets.fromLTRB(-30, -180, 0, 0),
                       ),
                     ),
                     Positioned(
-                      left: _continentPositions["Career"]!.dx,
-                      top: _continentPositions["Career"]!.dy,
+                      left: _continentPositions['Career']!.dx,
+                      top: _continentPositions['Career']!.dy,
                       child: ContinentChip(
                         key: _careerKey,
-                        label: "Career",
+                        islandIndex: 2,
+                        islands: islands,
                         onLongPressStart: (d) =>
-                            _onContinentLongPress("Career", d, _careerKey),
+                            _onContinentLongPress(categories[2], d, _careerKey),
                         tileScale: 0.32,
                         radius: 48,
                         size: const Size(520, 360),
+                        flagSize: 300,
+                        flagPadding: const EdgeInsets.fromLTRB(-30, -180, 0, 0),
                       ),
                     ),
                     Positioned(
-                      left: _continentPositions["Health"]!.dx,
-                      top: _continentPositions["Health"]!.dy,
+                      left: _continentPositions['Health']!.dx,
+                      top: _continentPositions['Health']!.dy,
                       child: ContinentChip(
                         key: _healthKey,
-                        label: "Health",
+                        islandIndex: 3,
+                        islands: islands,
                         onLongPressStart: (d) =>
-                            _onContinentLongPress("Health", d, _healthKey),
+                            _onContinentLongPress(categories[3], d, _healthKey),
                         tileScale: 0.32,
                         radius: 48,
                         size: const Size(520, 360),
+                        flagSize: 300,
+                        flagPadding: const EdgeInsets.fromLTRB(-30, -180, 0, 0),
                       ),
                     ),
 
@@ -226,7 +255,6 @@ class _ContinentMapScrollablePageState
                                     child: PinTooltip(
                                       title: pin['title'] ?? '',
                                       description: pin['description'] ?? '',
-                                      userId: pin['userId'] ?? '',
                                     ),
                                   ),
                                 InteractiveSparklePin(

@@ -66,6 +66,10 @@ flutter:
     - assets/images/user_cloud.png
     - assets/icons/icon_home.png
     - assets/icons/icon_list.png
+    - assets/flags/flag_academics.png
+    - assets/flags/flag_creativity.png
+    - assets/flags/flag_career.png
+    - assets/flags/flag_health.png
     # - assets/images/grass_sand_border.png
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
