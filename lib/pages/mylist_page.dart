@@ -26,15 +26,6 @@ class MyListPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('マイリスト'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: 'Logout',
-            onPressed: () {
-              FirebaseAuth.instance.signOut();
-            },
-          ),
-        ],
       ),
       // ▼▼▼ StreamBuilderを使ってFirestoreのデータを購読 ▼▼▼
       body: StreamBuilder<QuerySnapshot>(
