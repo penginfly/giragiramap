@@ -50,6 +50,7 @@ class _LoginViewState extends State<LoginView> {
         errorMessage = 'メールアドレスの形式が正しくありません。';
       }
 
+
       // 画面下部にエラーメッセージを表示
       if (mounted) { // widgetが有効な場合のみ実行
         ScaffoldMessenger.of(context).showSnackBar(
