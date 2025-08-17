@@ -61,6 +61,9 @@ flutter:
     # - assets/icons/user.png
     - assets/images/wave.png
     - assets/sounds/wave_sound.mp3
+    - assets/images/grass_tile.png
+    - assets/images/sand_tile.png
+    # - assets/images/grass_sand_border.png
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
