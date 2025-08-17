@@ -57,12 +57,15 @@ dev_dependencies:
 flutter:
   assets:
     - assets/icons/icon_map.png
-    # - assets/icons/list.png
-    # - assets/icons/user.png
     - assets/images/wave.png
     - assets/sounds/wave_sound.mp3
     - assets/images/grass_tile.png
     - assets/images/sand_tile.png
+    - assets/images/mypins_cloud.png
+    - assets/images/map_cloud.png
+    - assets/images/user_cloud.png
+    - assets/icons/icon_home.png
+    - assets/icons/icon_list.png
     # - assets/images/grass_sand_border.png
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
