@@ -1,0 +1,64 @@
+syntax:rule
+
+general instruction - tags
+delimiters
+
+<?php
+    //php code gose here
+?>
+
+
+torminator
+
+<?php
+    echo "This is a PHP statement.";
+?>
+
+this is a programming 
+
+echo "Hello World"
+echo
+
+display:
+-output
+-restore
+-information
+---echo or print 
+
+echo:
+-accept argument
+-in php you may use double or single 
+
+print:
+-only can accept single argument
+
+
+() blacket parentheses
+[] squre blacket
+{} curly blacket
+
+variables:
+-store data
+-always start with $ followed by variable name
+-are case-sensitive '$hello is not the same with $Hello'
+
+variablename: snake_case
+(legal)
+--$name
+--$NAME
+--$name1
+--$name2
+--$firstName
+--$first_name (_is the synbol only accepted)
+--$_myName
+(illegal)
+--$2name
+--$first-name
+--$@username
+
+Data Types: we
+-value/Data
+
+assing the data variable:
+
+
